@@ -11,6 +11,7 @@
             --text-muted: #888888;
             --accent: #dddddd;
             --border: #333333;
+            --glow: rgba(255, 255, 255, 0.1);
         }
         
         body {
@@ -20,6 +21,7 @@
             line-height: 1.6;
             margin: 0;
             padding: 0;
+            overflow-x: hidden;
         }
 
         .container {
@@ -28,10 +30,17 @@
             padding: 4rem 2rem;
         }
 
+        /* Initial Load Animation */
         header {
             border-bottom: 1px solid var(--border);
             padding-bottom: 2rem;
             margin-bottom: 3rem;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         h1 {
@@ -52,12 +61,24 @@
             text-decoration: none;
             margin-right: 1.5rem;
             font-size: 0.9rem;
-            border-bottom: 1px solid transparent;
-            transition: border-color 0.2s;
+            position: relative;
+            padding-bottom: 2px;
         }
 
-        .links a:hover {
-            border-bottom: 1px solid var(--text-main);
+        /* Dynamic Link Underlines */
+        .links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 1px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--text-main);
+            transition: width 0.3s ease;
+        }
+
+        .links a:hover::after {
+            width: 100%;
         }
 
         section {
@@ -72,22 +93,27 @@
             margin-bottom: 2rem;
         }
 
-        /* Project Cards */
+        /* Dynamic Project Cards */
         .project {
+            background-color: #0a0a0a;
             border: 1px solid var(--border);
             padding: 1.5rem;
             margin-bottom: 1.5rem;
-            transition: transform 0.2s, border-color 0.2s;
+            border-radius: 4px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
         }
 
         .project:hover {
             border-color: var(--text-main);
-            transform: translateY(-2px);
+            transform: translateY(-5px) scale(1.01);
+            box-shadow: 0 10px 30px var(--glow);
         }
 
         .project h3 {
             margin: 0 0 0.5rem 0;
             font-size: 1.3rem;
+            transition: color 0.3s ease;
         }
 
         .project p {
@@ -102,15 +128,44 @@
             color: var(--accent);
         }
 
-        /* Terminal Style for Code Block */
+        /* Animated Terminal */
         .terminal {
-            background-color: #111;
+            background-color: #0a0a0a;
             border: 1px solid var(--border);
-            padding: 1rem;
+            border-radius: 4px;
+            padding: 1.5rem;
             font-family: 'Courier New', Courier, monospace;
             font-size: 0.85rem;
             color: #00ff00;
-            margin-bottom: 2rem;
+            margin-bottom: 3rem;
+            min-height: 80px;
+            box-shadow: inset 0 0 10px rgba(0,255,0,0.05);
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 15px;
+            background-color: #00ff00;
+            animation: blink 1s step-end infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* Scroll Reveal Classes */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         @media (max-width: 600px) {
@@ -132,23 +187,21 @@
         </div>
     </header>
 
-    <div class="terminal">
-        > SYSTEM BOOT...<br>
-        > LOADING PROFILE: ABAYOMI_NELSON...<br>
-        > STATUS: ONLINE. PIPELINES OPTIMIZED.
+    <div class="terminal" id="terminal">
+        <span id="typewriter"></span><span class="cursor"></span>
     </div>
 
-    <section id="about">
-        <hdiv class="section-title">About</div>
+    <section id="about" class="reveal">
+        <div class="section-title">About</div>
         <p>I am a Senior Data Solutions Engineer with a Master of Data Science and a passion for bridging the gap between traditional Big Data architecture and the new frontier of Generative AI. Currently, I architect and optimize petabyte-scale data pipelines using PySpark, Python, and Delta Lake.</p>
         <p>I specialize in the Medallion Architecture, transforming raw, unstructured telemetry into highly validated, schema-enforced data products that drive enterprise-level decision-making. Beyond infrastructure, I build 100% local, privacy-first Retrieval-Augmented Generation (RAG) engines and predictive ML models to put AI directly into the hands of stakeholders.</p>
     </section>
 
-    <section id="projects">
+    <section id="projects" class="reveal">
         <div class="section-title">Architecture Portfolio</div>
 
         <a href="https://github.com/abayominelsonw21/aviation-density-project" style="text-decoration: none; color: inherit;">
-            <div class="project">
+            <div class="project reveal">
                 <h3>✈️ Global Aviation Pipeline (Medallion Architecture)</h3>
                 <p>Engineered a real-time ETL pipeline processing thousands of live flight vectors. Architected a three-tier Medallion structure (Bronze, Silver, Gold) with automated schema evolution, data type enforcement, and a Streamlit executive dashboard.</p>
                 <div class="tech-stack">[PySpark] [Delta Lake] [Streamlit] [OAuth2 API]</div>
@@ -156,7 +209,7 @@
         </a>
 
         <a href="https://github.com/abayominelsonw21/local-intel-rag" style="text-decoration: none; color: inherit;">
-            <div class="project">
+            <div class="project reveal">
                 <h3>💬 Local Intel RAG Engine</h3>
                 <p>Architected a 100% private, local Retrieval-Augmented Generation engine utilizing Llama 3. Implemented Maximal Marginal Relevance (MMR) retrieval logic to eliminate context bias and securely parse multi-page technical documents.</p>
                 <div class="tech-stack">[LangChain] [ChromaDB] [Ollama] [Streamlit]</div>
@@ -164,7 +217,7 @@
         </a>
 
         <a href="https://github.com/abayominelsonw21/AutoMarket-AI" style="text-decoration: none; color: inherit;">
-            <div class="project">
+            <div class="project reveal">
                 <h3>🚗 AutoMarket AI</h3>
                 <p>Built and containerized an end-to-end predictive machine learning pipeline using Python and Scikit-Learn to automate automotive valuation models, deployed via Docker for highly scalable environments.</p>
                 <div class="tech-stack">[Python] [Scikit-Learn] [Docker] [Pandas]</div>
@@ -172,7 +225,7 @@
         </a>
     </section>
 
-    <section id="experience">
+    <section id="experience" class="reveal">
         <div class="section-title">Experience Highlights</div>
         <p><strong>Data Solutions Engineer @ Epsilon</strong><br>
         <span style="color: #888;">Chicago, IL | Feb 2025 - Present</span><br>
@@ -180,10 +233,61 @@
         
         <p style="margin-top: 1.5rem;"><strong>Data Product Analyst @ Chamberlain Group</strong><br>
         <span style="color: #888;">Chicago, IL | Jan 2023 - Feb 2025</span><br>
-        Designed Medallion architecture dashboards, reducing query times from days to minutes. Successfully onboarded third-party data sources driving the acquisition of 30+ corporate customers.</p>
+        Designed Medallion architecture dashboards reducing query times from days to minutes. Successfully onboarded third-party data sources driving the acquisition of 30+ corporate customers.</p>
     </section>
 
 </div>
+
+<script>
+    // 1. Terminal Typewriter Effect
+    const texts = [
+        "> SYSTEM BOOT...",
+        "> LOADING PROFILE: ABAYOMI_NELSON...",
+        "> PIPELINES OPTIMIZED.",
+        "> STATUS: ONLINE."
+    ];
+    let textIndex = 0;
+    let charIndex = 0;
+    const typewriterElement = document.getElementById('typewriter');
+
+    function typeWriter() {
+        if (textIndex < texts.length) {
+            if (charIndex < texts[textIndex].length) {
+                typewriterElement.innerHTML += texts[textIndex].charAt(charIndex);
+                charIndex++;
+                setTimeout(typeWriter, 40); // Typing speed
+            } else {
+                typewriterElement.innerHTML += "<br>";
+                textIndex++;
+                charIndex = 0;
+                setTimeout(typeWriter, 400); // Pause between lines
+            }
+        }
+    }
+    
+    // Start typing after a short delay
+    setTimeout(typeWriter, 500);
+
+    // 2. Scroll Reveal Animation using Intersection Observer
+    function reveal() {
+        var reveals = document.querySelectorAll(".reveal");
+        for (var i = 0; i < reveals.length; i++) {
+            var windowHeight = window.innerHeight;
+            var elementTop = reveals[i].getBoundingClientRect().top;
+            var elementVisible = 100; // How far down before it triggers
+
+            if (elementTop < windowHeight - elementVisible) {
+                reveals[i].classList.add("active");
+            }
+        }
+    }
+
+    // Listen for scroll events
+    window.addEventListener("scroll", reveal);
+    
+    // Trigger once on load in case elements are already in view
+    reveal();
+</script>
 
 </body>
 </html>
